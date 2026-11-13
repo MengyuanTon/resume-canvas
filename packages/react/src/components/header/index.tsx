@@ -10,6 +10,7 @@ export const Header: FC = () => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.brand}>简历画布</div>
       <Left editor={editor} />
       <Right editor={editor} />
     </div>

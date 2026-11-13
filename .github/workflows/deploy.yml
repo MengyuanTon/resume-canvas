@@ -1,39 +1,39 @@
-name: deploy gh-pages
+name: Deploy resume editor
 
 on:
   push:
-    branches:
-      - master
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
-          persist-credentials: false
-          
-      - name: install node-v16
-        uses: actions/setup-node@v3
+          version: 8.11.0
+      - uses: actions/setup-node@v4
         with:
-          node-version: "16.16.0"
-
-      - name: install dependencies
-        run: |
-          node -v
-          npm install -g pnpm@8.11.0
-          pnpm config set registry https://registry.npmjs.org/
-          pnpm install --registry=https://registry.npmjs.org/
-
-      - name: build project
-        run: |
-          npm run build:react
-
-      - name: deploy project
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --registry=https://registry.npmjs.org/
+      - run: pnpm build:react
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: packages/react/build
+          path: packages/react/build
+      - uses: actions/deploy-pages@v4
+        id: deployment

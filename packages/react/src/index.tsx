@@ -15,16 +15,20 @@ DeltaSet.register(Image);
 const urlParams = new URL(location.href).searchParams;
 const isPreview = urlParams.get("preview") !== null;
 
-if (isPreview) {
-  const Preview = lazy(() =>
-    import("./components/preview").then(module => ({ default: module.Preview }))
-  );
-  ReactDOM.render(
-    <Suspense fallback={<></>}>
-      <Preview></Preview>
-    </Suspense>,
-    document.getElementById("root")
-  );
-} else {
-  ReactDOM.render(<App />, document.getElementById("root"));
-}
+const start = () => {
+  if (isPreview) {
+    const Preview = lazy(() =>
+      import("./components/preview").then(module => ({ default: module.Preview }))
+    );
+    ReactDOM.render(
+      <Suspense fallback={<></>}>
+        <Preview></Preview>
+      </Suspense>,
+      document.getElementById("root")
+    );
+  } else {
+    ReactDOM.render(<App />, document.getElementById("root"));
+  }
+};
+
+Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 1200))]).then(start);

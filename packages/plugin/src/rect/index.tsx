@@ -24,7 +24,10 @@ export class Rect extends Delta {
       if (width > 0 && height > 0) {
         ctx.fillStyle = fillColor;
         const half = borderWidth / 2;
-        ctx.fillRect(this.x + half, this.y + half, width, height);
+        const radius = Number(this.getAttr("radius")) || 0;
+        ctx.beginPath();
+        ctx.roundRect(this.x + half, this.y + half, width, height, radius);
+        ctx.fill();
       }
     }
     if (borderColor) {

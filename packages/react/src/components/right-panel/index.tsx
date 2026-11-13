@@ -74,7 +74,7 @@ export const RightPanel: FC = () => {
             <div className={cs(styles.pos, styles.rb)}>{rect.rb}</div>
           </div>
         )}
-        {active.length === 0 && "请选择图形"}
+        {active.length === 0 && "点击画布选中对象，双击文字进入编辑。"}
         {active.length === 1 && loadEditor()}
       </div>
     </div>

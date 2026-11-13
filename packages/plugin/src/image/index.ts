@@ -8,11 +8,11 @@ export class Image extends Delta {
   public static KEY = "image";
   public key = Image.KEY;
   private loaded = false;
-  private image: HTMLImageElement;
+  private ready?: Promise<Delta>;
+  private image!: HTMLImageElement;
 
   public constructor(options: DeltaOptions) {
     super(options);
-    this.image = new globalThis.Image(this.width, this.height);
     this.updateImage(this.getAttr(IMAGE_ATTRS.SRC));
   }
 
@@ -28,6 +28,8 @@ export class Image extends Delta {
   }
 
   public drawing = (ctx: CanvasRenderingContext2D) => {
+    if (!this.loaded) return this.ready;
+    if (!this.image.naturalWidth) return;
     ctx.save();
     ctx.beginPath();
     ctx.rect(this.x, this.y, this.width, this.height);
@@ -80,20 +82,22 @@ export class Image extends Delta {
     }
     ctx.closePath();
     ctx.restore();
-    if (this.loaded) return void 0;
-    // 避免图片异步加载问题
-    return new Promise<Delta>(resolve => {
-      this.image.onload = () => {
-        this.loaded = true;
-        resolve(this);
-      };
-    });
   };
 
   private updateImage(value: string | null) {
+    const image = new globalThis.Image(this.width, this.height);
+    this.image = image;
     this.loaded = false;
-    this.image.src = value || EMPTY;
-    this.image.onload = () => (this.loaded = true);
+    this.ready = new Promise(resolve => {
+      const finish = () => {
+        if (this.image === image) this.loaded = true;
+        resolve(this);
+      };
+      image.onload = finish;
+      image.onerror = finish;
+      image.src = value || EMPTY;
+      if (image.complete) finish();
+    });
   }
 
   public setAttr(key: string, value: string | null): this {

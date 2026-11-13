@@ -50,11 +50,11 @@ export const Template: FC<{
         const res: LocalStorageData | null = await loadTemplate(item.template);
         setLoading(false);
         if (!res) return Message.error("模板加载失败");
-        Storage.local.set(STORAGE_KEY, res);
+        Background.setRange(Range.fromRect(res.x, res.y, res.width, res.height));
         const deltaSetLike = res.deltaSetLike;
         const deltaSet = new DeltaSet(deltaSetLike);
         editor.state.setContent(deltaSet);
-        Background.setRange(Range.fromRect(res.x, res.y, res.width, res.height));
+        Storage.local.set(STORAGE_KEY, res);
         Background.render();
       },
     });

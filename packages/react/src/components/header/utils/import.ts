@@ -27,13 +27,18 @@ export const importJSON = async (editor: Editor) => {
           try {
             const str = e.target && e.target.result;
             const json = isString(str) && TSON.parse<LocalStorageData>(str);
-            if (json) {
+            if (
+              json && json.deltaSetLike && json.deltaSetLike.ROOT?.key === "entry" &&
+              [json.x, json.y, json.width, json.height].every(Number.isFinite) &&
+              json.width > 0 && json.height > 0 && json.width <= 4000 && json.height <= 6000
+            ) {
               const deltaSetLike = json.deltaSetLike;
               const deltaSet = new DeltaSet(deltaSetLike);
-              editor.state.setContent(deltaSet);
               Background.setRange(Range.fromRect(json.x, json.y, json.width, json.height));
+              editor.state.setContent(deltaSet);
               Background.render();
               Storage.local.set(STORAGE_KEY, json);
+              Message.success("已导入并保存到此浏览器");
             } else {
               Message.error("导入失败，请检查文件");
             }
@@ -47,5 +52,6 @@ export const importJSON = async (editor: Editor) => {
       document.body.appendChild(input);
     };
   }
+  input.value = "";
   input.click();
 };

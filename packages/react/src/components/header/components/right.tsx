@@ -1,4 +1,4 @@
-import { Button, Dropdown, InputNumber, Menu, Modal } from "@arco-design/web-react";
+import { Button, Dropdown, InputNumber, Menu, Message, Modal } from "@arco-design/web-react";
 import type { RefInputType } from "@arco-design/web-react/es/Input";
 import { IconDown, IconGithub, IconRedo, IconUndo } from "@arco-design/web-react/icon";
 import { useMemoFn } from "@block-kit/utils/dist/es/hooks";
@@ -75,6 +75,20 @@ export const Right: FC<{
     });
   };
 
+  const onSave = () => {
+    try {
+      const data = { ...Background.rect, deltaSetLike: editor.deltaSet.getDeltas() };
+      Storage.local.set(STORAGE_KEY, data);
+      Message.success("已保存到此浏览器");
+    } catch {
+      Message.error("浏览器存储不可用，请下载 JSON 备份");
+    }
+  };
+
+  const download = () => {
+    exportPDF(editor, 2).catch(() => Message.error("PDF 导出失败，请检查图片后重试"));
+  };
+
   return (
     <div className={cs(styles.externalGroup)}>
       <div className={styles.history}>
@@ -95,6 +109,9 @@ export const Right: FC<{
           size="small"
         ></Button>
       </div>
+      <Button size="small" type="text" onClick={onSave}>保存到浏览器</Button>
+      <Button size="small" type="text" onClick={() => importJSON(editor)}>导入本地 JSON</Button>
+      <Button size="small" type="primary" onClick={download}>下载 PDF</Button>
       <Dropdown
         droplist={
           <Menu className={styles.menu}>
@@ -127,7 +144,7 @@ export const Right: FC<{
         droplist={
           <Menu className={styles.menu}>
             <Menu.Item key="1">
-              <div className={styles.export} onClick={() => exportPDF()}>
+              <div className={styles.export} onClick={() => exportPDF(editor).catch(() => Message.error("PDF 导出失败"))}>
                 PDF
               </div>
             </Menu.Item>
@@ -137,7 +154,7 @@ export const Right: FC<{
               </div>
             </Menu.Item>
             <Menu.Item key="2">
-              <div className={styles.export} onClick={() => exportPDF(2)}>
+              <div className={styles.export} onClick={download}>
                 PDF(高清)
               </div>
             </Menu.Item>
@@ -154,7 +171,9 @@ export const Right: FC<{
       <a
         className={styles.github}
         target="_blank"
-        href={"https://github.com/WindrunnerMax/CanvasEditor"}
+        href="https://github.com/MengyuanTon/resume-canvas"
+        aria-label="GitHub 仓库"
+        rel="noreferrer"
       >
         <IconGithub />
       </a>

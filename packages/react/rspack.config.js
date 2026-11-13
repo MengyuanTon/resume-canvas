@@ -13,13 +13,14 @@ module.exports = {
     index: "./src/index.tsx",
   },
   externals: {
-    "react": "React",
-    "react-dom": "ReactDOM",
     "blob-stream": "blobStream",
     "pdfkit": "PDFDocument",
   },
   plugins: [
-    new CopyPlugin([{ from: "./public", to: "." }]),
+    new CopyPlugin([
+      { from: "./public", to: ".", globOptions: { ignore: ["**/template/**", "**/index.html"] } },
+      { from: "../../LICENSE", to: "LICENSE" },
+    ]),
     new HtmlPlugin({
       filename: "index.html",
       template: "./public/index.html",

@@ -33,7 +33,7 @@ import type { Editor } from "sketching-core";
 import { Op, OP_TYPE } from "sketching-delta";
 import type { Attributes } from "sketching-plugin";
 import { TEXT_ATTRS } from "sketching-plugin";
-import { debounce, TSON } from "sketching-utils";
+import { TSON } from "sketching-utils";
 
 import { useIsMounted } from "../../../../../hooks/is-mounted";
 import { schema } from "../config/schema";
@@ -85,11 +85,11 @@ export const RichTextEditor: FC<{
   });
 
   useEffect(() => {
-    const updateText = debounce((event: ContentChangeEvent) => {
+    const updateText = (event: ContentChangeEvent) => {
       const { current } = event;
       dataRef.current = current;
       onSaveChange(current);
-    }, 300);
+    };
     blockEditor.event.on(EDITOR_EVENT.CONTENT_CHANGE, updateText);
     return () => {
       blockEditor.event.off(EDITOR_EVENT.CONTENT_CHANGE, updateText);

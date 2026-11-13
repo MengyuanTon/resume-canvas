@@ -9,7 +9,7 @@ export const Body = forwardRef<HTMLDivElement, { className?: string }>((props, r
   return (
     <div className={cs(styles.container, props.className)}>
       <LeftPanel></LeftPanel>
-      <div className={styles.canvas} ref={ref}></div>
+      <div className={styles.canvas} ref={ref} aria-label="简历编辑画布"></div>
       <RightPanel></RightPanel>
     </div>
   );

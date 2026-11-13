@@ -1,3 +1,4 @@
+import { Message } from "@arco-design/web-react";
 import type { FC } from "react";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import type { ContentChangeEvent } from "sketching-core";
@@ -44,7 +45,11 @@ export const App: FC = () => {
     const onContentChange = (e: ContentChangeEvent) => {
       const deltaSetLike = e.current.getDeltas();
       const storageData: LocalStorageData = { ...Background.rect, deltaSetLike };
-      Storage.local.set(STORAGE_KEY, storageData);
+      try {
+        Storage.local.set(STORAGE_KEY, storageData);
+      } catch {
+        Message.error("自动保存失败，请下载 JSON 备份");
+      }
     };
     editor.event.on(EDITOR_EVENT.CONTENT_CHANGE, onContentChange);
     return () => {

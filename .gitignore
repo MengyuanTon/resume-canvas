@@ -1,5 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Private drafts and template conversion inputs
+/.resume-template.*
+*.private.json
+*-画布私有稿.json
+
 # log
 *.log
 

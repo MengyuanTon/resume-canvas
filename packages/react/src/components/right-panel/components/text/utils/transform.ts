@@ -30,7 +30,7 @@ export const sketchToTextDelta = (lines: RichTextLines): Delta => {
     for (const item of line.chars) {
       const { char, config } = item;
       const attrs: AttributeMap = {};
-      if (config[TEXT_ATTRS.WEIGHT] === "bold") {
+      if (config[TEXT_ATTRS.WEIGHT] === "bold" || Number(config[TEXT_ATTRS.WEIGHT]) >= 600) {
         attrs[BOLD_KEY] = TRULY;
       }
       if (config[TEXT_ATTRS.STYLE] === "italic") {

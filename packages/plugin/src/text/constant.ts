@@ -25,7 +25,7 @@ export const TEXT_ATTRS = {
 
 export const DEFAULT = {
   [TEXT_ATTRS.FAMILY]:
-    "Inter,-apple-system,BlinkMacSystemFont,PingFang SC,Hiragino Sans GB,noto sans,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif",
+    "Inter,Noto Sans SC,-apple-system,BlinkMacSystemFont,PingFang SC,Hiragino Sans GB,noto sans,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif",
   [TEXT_ATTRS.SIZE]: 14,
   [TEXT_ATTRS.WEIGHT]: "normal",
   [TEXT_ATTRS.STYLE]: "normal",

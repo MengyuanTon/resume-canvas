@@ -1,23 +1,19 @@
 import { Message } from "@arco-design/web-react";
 import type { Editor } from "sketching-core";
-import { Range } from "sketching-core";
 import type { Delta } from "sketching-delta";
 import { DeltaSet } from "sketching-delta";
-import { DateTime, Storage } from "sketching-utils";
+import { DateTime } from "sketching-utils";
 
 import { Background } from "../../../modules/background";
-import type { LocalStorageData } from "../../../utils/storage";
-import { EXAMPLE, STORAGE_KEY } from "../../../utils/storage";
 import { parseLinks } from "./link";
 
-export const exportPDF = async (DPI = 1) => {
+export const exportPDF = async (editor: Editor, DPI = 1) => {
   if (!window.PDFDocument || !window.blobStream) {
-    Message.warning("PDF模块未加载完成，请稍后");
+    Message.warning("PDF 模块未加载完成，请稍后");
+    return;
   }
-  const data = Storage.local.get<LocalStorageData>(STORAGE_KEY) || EXAMPLE;
-  const deltaSetLike = data && data.deltaSetLike;
-  Background.setRange(Range.fromRect(data.x, data.y, data.width, data.height));
-  const deltaSet = new DeltaSet(deltaSetLike);
+  await document.fonts.ready;
+  const deltaSet = new DeltaSet(editor.deltaSet.getDeltas());
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
   const { x, y, width, height } = Background.rect;
@@ -32,27 +28,26 @@ export const exportPDF = async (DPI = 1) => {
   ctx.fillRect(0, 0, width, height);
   ctx.translate(-x, -y);
   const deltas: Delta[] = [];
-  const tasks: Promise<Delta>[] = [];
   deltaSet.forEach((_, delta) => deltas.push(delta));
   deltas.sort((a, b) => a.getZ() - b.getZ());
-  deltas.forEach(delta => {
-    const task = delta.drawing(ctx);
-    task && tasks.push(task);
-  });
-  await Promise.all(tasks).then(delta => {
-    delta.forEach(it => it.drawing(ctx));
-  });
+  for (const delta of deltas) {
+    const pending = delta.drawing(ctx);
+    if (pending) {
+      await pending;
+      delta.drawing(ctx);
+    }
+  }
   const base64 = canvas.toDataURL("image/jpeg");
   const links = parseLinks(deltaSet);
   const doc = new window.PDFDocument({
-    size: [width, height],
+    size: [width * 0.75, height * 0.75],
+    margin: 0,
   });
   links.forEach(link => {
-    doc.link(link.x, link.y, link.width, link.height, link.url);
+    doc.link(link.x * 0.75, link.y * 0.75, link.width * 0.75, link.height * 0.75, link.url);
   });
-  doc.image(base64, 0, 0, { width, height });
+  doc.image(base64, 0, 0, { width: width * 0.75, height: height * 0.75 });
   const stream = doc.pipe(window.blobStream());
-  doc.end();
   stream.on("finish", function () {
     const url = stream.toBlobURL("application/pdf");
     const a = document.createElement("a");
@@ -60,7 +55,9 @@ export const exportPDF = async (DPI = 1) => {
     const now = new DateTime().format("yyyyMMdd_hhmmss");
     a.download = "RESUME_" + now + ".pdf";
     a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
+  doc.end();
 };
 
 export const exportJSON = (editor: Editor) => {
@@ -74,4 +71,5 @@ export const exportJSON = (editor: Editor) => {
   const now = new DateTime().format("yyyyMMdd_hhmmss");
   a.download = "RESUME_" + now + ".json";
   a.click();
+  setTimeout(() => URL.revokeObjectURL(href), 1000);
 };

@@ -5,6 +5,8 @@ $width: 300px;
   border-radius: 6px;
   bottom: 20px;
   box-sizing: border-box;
+  background: var(--color-bg-1);
+  box-shadow: 0 4px 18px rgba(26, 58, 92, .10);
   color: var(--color-text-1);
   flex-shrink: 0;
   max-height: calc(100% - 60px);
@@ -98,4 +100,8 @@ $width: 300px;
       width: 100%;
     }
   }
+}
+
+@media (max-width: 820px) {
+  .container { width: min(260px, 60vw); max-height: 50%; top: auto; bottom: 16px; }
 }

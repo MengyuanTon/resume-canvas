@@ -14,7 +14,7 @@ export class Background {
     dom.style.position = "relative";
     Background.canvas = document.createElement("canvas");
     Background.ctx = Background.canvas.getContext("2d") as CanvasRenderingContext2D;
-    Background.canvas.style.background = "var(--color-fill-3)";
+    Background.canvas.style.background = "#f0f4f8";
     Background.canvas.style.position = "absolute";
     Background.canvas.style.zIndex = "-1";
     Background.setRect(dom.offsetWidth, dom.offsetHeight);
@@ -59,7 +59,14 @@ export class Background {
     ctx.clearRect(0, 0, width, height);
     const rect = space.rect();
     ctx.fillStyle = "#fff";
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.save();
+    ctx.shadowColor = "rgba(26, 58, 92, .12)";
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 4;
+    ctx.beginPath();
+    ctx.roundRect(rect.x, rect.y, rect.width, rect.height, 8);
+    ctx.fill();
+    ctx.restore();
   }
 
   private static onReset(e: CanvasResetEvent) {
