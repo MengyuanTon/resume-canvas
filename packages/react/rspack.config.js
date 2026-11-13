@@ -1,6 +1,5 @@
 const path = require("path");
 const { default: HtmlPlugin } = require("@rspack/plugin-html");
-const CopyPlugin = require("copy-webpack-plugin");
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -17,10 +16,6 @@ module.exports = {
     "pdfkit": "PDFDocument",
   },
   plugins: [
-    new CopyPlugin([
-      { from: "./public", to: ".", globOptions: { ignore: ["**/template/**", "**/index.html"] } },
-      { from: "../../LICENSE", to: "LICENSE" },
-    ]),
     new HtmlPlugin({
       filename: "index.html",
       template: "./public/index.html",
