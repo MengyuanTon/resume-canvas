@@ -26,11 +26,7 @@
     border-radius: 4px;
   }
 
-  &:hover img, &:focus-visible img {
+  &:hover img, &:focus-visible img, &[aria-pressed="true"] img {
     border-color: #2563eb;
   }
-}
-
-.modalContent {
-  text-align: center;
 }

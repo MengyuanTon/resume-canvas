@@ -6,11 +6,11 @@ import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { Editor } from "sketching-core";
 import { EDITOR_EVENT, Range } from "sketching-core";
-import { cs, Storage } from "sketching-utils";
+import { cs } from "sketching-utils";
 
 import { Background } from "../../../modules/background";
 import type { LocalStorageData } from "../../../utils/storage";
-import { STORAGE_KEY } from "../../../utils/storage";
+import { saveDraft } from "../../../utils/storage";
 import styles from "../index.m.scss";
 import { exportJSON, exportPDF } from "../utils/export";
 import { importJSON } from "../utils/import";
@@ -69,7 +69,7 @@ export const Right: FC<{
         width && height && Background.setRange(Range.fromRect(x, y, width, height));
         const deltaSetLike = editor.deltaSet.getDeltas();
         const storageData: LocalStorageData = { ...Background.rect, deltaSetLike };
-        Storage.local.set(STORAGE_KEY, storageData);
+        saveDraft(storageData);
         Background.render();
       },
     });
@@ -78,7 +78,7 @@ export const Right: FC<{
   const onSave = () => {
     try {
       const data = { ...Background.rect, deltaSetLike: editor.deltaSet.getDeltas() };
-      Storage.local.set(STORAGE_KEY, data);
+      saveDraft(data);
       Message.success("已保存到此浏览器");
     } catch {
       Message.error("浏览器存储不可用，请下载 JSON 备份");

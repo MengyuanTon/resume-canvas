@@ -9,7 +9,7 @@ import { Storage } from "sketching-utils";
 import { WithEditor } from "../../hooks/use-editor";
 import { Background } from "../../modules/background";
 import type { LocalStorageData } from "../../utils/storage";
-import { EXAMPLE, STORAGE_KEY } from "../../utils/storage";
+import { EXAMPLE, getDraft, saveDraft } from "../../utils/storage";
 import { Body } from "../body";
 import { ContextMenu } from "../context-menu";
 import { Header } from "../header";
@@ -20,7 +20,7 @@ Storage.setSuffix("");
 export const App: FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const editor = useMemo(() => {
-    const data = Storage.local.get<LocalStorageData>(STORAGE_KEY) || EXAMPLE;
+    const data = getDraft() || EXAMPLE;
     Background.setRange(Range.fromRect(data.x, data.y, data.width, data.height));
     const deltaSetLike = data && data.deltaSetLike;
     return new Editor({
@@ -46,7 +46,7 @@ export const App: FC = () => {
       const deltaSetLike = e.current.getDeltas();
       const storageData: LocalStorageData = { ...Background.rect, deltaSetLike };
       try {
-        Storage.local.set(STORAGE_KEY, storageData);
+        saveDraft(storageData);
       } catch {
         Message.error("自动保存失败，请下载 JSON 备份");
       }
